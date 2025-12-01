@@ -14,16 +14,19 @@ const supabase = createClient(
 
 export default async function handler(req, res) {  
   const apiKey = req.headers['authorization']?.split(' ')[1];
+  console.log(apiKey)
   if (apiKey !== process.env.LOCATION_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  
+
+  console.log("Method: " + req.method)
   if (req.method !== 'POST') {
     return res.status(405).json({ error: `Method not authorized` });
-  } 
+  }
 
   try {
     const data = req.body.locations
+    console.log(data)
     if (!data || !Array.isArray(data) || data.length === 0) {
       return res.status(400).json({ error: 'No locations shared' });
     }
@@ -37,12 +40,13 @@ export default async function handler(req, res) {
 
 
     const { error } = await supabase.from('trackings').insert(rows);
+    console.error(error)
     if (error) throw error;
 
     // OVERLAND client expects result ok
     res.status(200).json({ result: 'ok'});
   } catch (err) {
+    console.error('Server error:' + err.message)
     res.status(500).json({ error: 'Server error:' + err.message });
   }
-
 }
