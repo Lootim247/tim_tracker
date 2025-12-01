@@ -1,8 +1,8 @@
 // Depends on SUPABASE trackings table
 // 12/1/2025 table expects:
 // created_at = timestamp
-// longitude  = integer
-// latitude   = integer
+// longitude  = float
+// latitude   = float
 // user_id    = integer
 
 import { createClient } from '@supabase/supabase-js';
@@ -19,16 +19,14 @@ export default async function handler(req, res) {
   }
   
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: `Method not ${req.method}` });
   } 
 
   try {
-    if (!req.body || !Array.isArray(req.body) || locations.length === 0) {
-      return res.status(405).json({ error: 'No locations shared' });
+    const data = req.body.locations
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return res.status(400).json({ error: 'No locations shared' });
     }
-
-    const data = req.body
-    console.log('Received JSON:', data);
 
     let rows = data.map(loc => ({
       longitude   : loc.geometry.coordinates[0],
@@ -44,7 +42,7 @@ export default async function handler(req, res) {
     // OVERLAND client expects result ok
     res.status(200).json({ result: 'ok'});
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 
 }
