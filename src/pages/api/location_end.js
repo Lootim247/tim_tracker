@@ -13,23 +13,28 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+  const apiKey = req.headers['authorization']?.split(' ')[1];
+  if (apiKey !== process.env.LOCATION_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   } 
 
   try {
-    if (!req.body || !Array.isArray(locations) || locations.length === 0) {
+    if (!req.body || !Array.isArray(req.body) || locations.length === 0) {
       return res.status(405).json({ error: 'No locations shared' });
     }
 
     const data = req.body
-    let location_data = []
     console.log('Received JSON:', data);
-    data.map(loc => ({
-      long        : loc.geometry.coordinates[0],
-      lat         : loc.geometry.coordinates[1],
-      timestamp   : loc.properties.timestamp,
-      id          : loc.properties.device_id,
+
+    let rows = data.map(loc => ({
+      longitude   : loc.geometry.coordinates[0],
+      latitude    : loc.geometry.coordinates[1],
+      created_at  : loc.properties.timestamp,
+      user_id     : parseInt(loc.properties.device_id || 0)
     }));
 
 
