@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: "/project2",
-  assetPrefix: "/project2",
+  basePath: "/tim-tracker",
+  assetPrefix: "/tim-tracker",
   reactStrictMode: true,
 };
 
