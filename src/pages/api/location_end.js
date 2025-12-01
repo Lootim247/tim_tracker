@@ -12,14 +12,14 @@ const supabase = createClient(
   process.env.DATABASE_KEY
 );
 
-export default async function handler(req, res) {
+export default async function handler(req, res) {  
   const apiKey = req.headers['authorization']?.split(' ')[1];
   if (apiKey !== process.env.LOCATION_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: `Method not ${req.method}` });
+    return res.status(405).json({ error: `Method not authorized` });
   } 
 
   try {
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     // OVERLAND client expects result ok
     res.status(200).json({ result: 'ok'});
   } catch (err) {
-    res.status(500).json({ error: 'Server error', details: err.message });
+    res.status(500).json({ error: 'Server error:' + err.message });
   }
 
 }
