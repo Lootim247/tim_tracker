@@ -9,7 +9,8 @@
 
 import { db } from '@/lib/db/server'
 
-export default async function handler(req, res) {  
+export default async function handler(req, res) { 
+  const DIST_THRESH = 10;
   const apiKey = req.headers['authorization']?.split(' ')[1];
   console.log(apiKey)
   if (apiKey !== process.env.LOCATION_API_KEY) {
@@ -19,20 +20,36 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const data = req.body.locations
-      console.log(data)
+      const num_data = req.body.locations.length
+
       if (!data || !Array.isArray(data) || data.length === 0) {
         return res.status(400).json({ error: 'No locations shared' });
       }
 
-      let rows = data.map(loc => ({
-        longitude   : loc.geometry.coordinates[0],
-        latitude    : loc.geometry.coordinates[1],
-        created_at  : loc.properties.timestamp,
-        user_id     : parseInt(loc.properties.device_id || 0)
-      }));
+      let filteredRows = data.reduce((acc, loc, i) => {
+        const row = {
+          longitude: loc.geometry.coordinates[0],
+          latitude: loc.geometry.coordinates[1],
+          created_at: loc.properties.timestamp,
+          user_id: parseInt(loc.properties.device_id || 0)
+        };
+
+        const last = acc[acc.length - 1];
+        if (last) {
+          if (Math.abs(last.longitude - row.longitude) < DIST_THRESH &&
+              Math.abs(last.latitude - row.latitude) < DIST_THRESH) {
+            return acc;
+          }
+        }
+
+        acc.push(row);
+        return acc;
+      }, []);
 
 
-      const { error } = await db.from('trackings').insert(rows);
+      console.log(filteredRows)
+
+      const { error } = await db.from('trackings').insert(filteredRows);
       console.error(error)
       if (error) throw error;
 
