@@ -1,45 +1,66 @@
-import { useEffect } from "react";
-import Head from "next/head";
-import Image from "next/image";
-import styles from "@/styles/Home.module.css";
+"use client"
+import { useState, useEffect } from "react";
+import MapboxMap from "../components/MapBox";
+import {styles} from "@/styles/Home.module.css"
 
-export default function Home() {
-  useEffect(() => {
-    const sendLocation = async () => {
+export default function MapPage() {
+  const [geoJSON, setJSON] = useState({type : "FeatureCollection", features: []})
+  const [date, setDate] = useState(new Date().toDateString())
+
+  useEffect(()=> {
+    async function fetchTrackings() {
+      const { getTrackingsByTimeUID } = await import("@/lib/db/trackings");
+      const { db_client } = await import("@/lib/db/client_db");
+
+      const startTime = `${date} 00:00:00+00`;
+      const endTime   = `${date} 23:59:59+00`;
+      const UID = 0
+
       try {
-        const res = await fetch('tim-tracker/api/location_end', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer qwertyuiopasdfghjkl'
-          },
-          body: JSON.stringify({
-            locations: [
-              {
-                geometry: { type: 'Point', coordinates: [-122.03, 37.33] },
-                properties: { timestamp: '2025-12-01T14:00:00Z', device_id: '0' }
-              }
-            ]
-          })
-        });
+        const data = await getTrackingsByTimeUID(db_client, startTime, endTime, UID);
+        console.log(data)
 
-        const data = await res.json();
-        console.log('API response:', data);
+        if (!data || !Array.isArray(data)) {
+          console.error("No data returned!")
+          setJSON({type : "FeatureCollection", features: []})
+          return
+        }
+
+        const json_feat = data.map((element) => ({
+          type : "Feature",
+          geometry : {
+            type        : "Point",
+            coordinates : [element.longitude, element.latitude]
+          }
+        }));
+
+        setJSON({type : "FeatureCollection", features: json_feat})
       } catch (err) {
-        console.error('Error sending location:', err);
+        console.error(err)
+        setJSON({type : "FeatureCollection", features: []})
       }
-    };
+    }
 
-    sendLocation();
-  }, []);
+    fetchTrackings()
+  }, [date])
+
+  function changeDay(change) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + change);
+    setDate(d.toDateString())
+  }
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Home</title>
-      </Head>
-      <h1>Home Page</h1>
-      <p>Sending test location to API...</p>
+    <div>
+      <div>
+        <div onClick={() => {changeDay(-1)}}>{'<'}</div>
+        <div>{date}</div>
+        <div onClick={() => {changeDay(1)}}>{'>'}</div>
+      </div>
+      <MapboxMap geoJSON={geoJSON}/>
     </div>
-  );
+    
+  ) 
+  
+  
 }
