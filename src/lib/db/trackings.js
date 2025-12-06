@@ -1,5 +1,4 @@
 export async function getTrackingsByTimeUID(DB_client, timestamp1, timestamp2, id) {
-    console.log("starting queries")
     const { data, error } = await DB_client
         .from("trackings")
         .select("created_at, longitude, latitude")

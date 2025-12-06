@@ -31,7 +31,6 @@ export default function MapboxMap( {geoJSON} ) {
   }, []);
 
   useEffect(() => {
-    console.log("entered second loader")
     if (!map || !mapContainerRef) return 
 
     // load a mapbox layer using geojson data served from my API endpoint. 
