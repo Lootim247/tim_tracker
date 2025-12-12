@@ -10,7 +10,35 @@
 import { db } from '@/lib/db/server'
 
 export default async function handler(req, res) { 
-  const DIST_THRESH = 10;
+  const DIST_THRESH = 0.01;
+
+  
+  // Calculates distance between two points "as the crow flies"
+  // returns distance in kilometers
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in kilometers
+
+    // Helper function to convert degrees to radians
+    function degToRad(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    const dLat = degToRad(lat2 - lat1);
+    const dLon = degToRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance;
+  }
+
+
+
   const apiKey = req.headers['authorization']?.split(' ')[1];
   console.log(apiKey)
   if (apiKey !== process.env.LOCATION_API_KEY) {
@@ -36,8 +64,7 @@ export default async function handler(req, res) {
 
         const last = acc[acc.length - 1];
         if (last) {
-          if (Math.abs(last.longitude - row.longitude) < DIST_THRESH &&
-              Math.abs(last.latitude - row.latitude) < DIST_THRESH) {
+          if (DIST_THRESH <= calculateDistance(row.latitude, row.longitude, last.latitude, last.longitude)) {
             return acc;
           }
         }
@@ -45,9 +72,6 @@ export default async function handler(req, res) {
         acc.push(row);
         return acc;
       }, []);
-
-
-      console.log(filteredRows)
 
       const { error } = await db.from('trackings').insert(filteredRows);
       console.error(error)
