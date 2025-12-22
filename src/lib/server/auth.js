@@ -1,5 +1,6 @@
 "use server"
-import { createServerSupabase } from "@/lib/db/server"
+import "server-only"
+import { createServerSupabase } from "@/lib/server/server_db"
 
 export const login = async (email, password) => {
     return

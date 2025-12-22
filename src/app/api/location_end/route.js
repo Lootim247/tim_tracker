@@ -7,8 +7,8 @@
 // latitude   = float
 // user_id    = integer
 
-import { db } from '@/lib/db/server'
-import { haversine } from '@/lib/funcs/points'
+import { db } from '@/lib/server/server_db'
+import { haversine } from '@/lib/shared/points'
 
 export default async function handler(req, res) { 
   // equivalent to 10 meters

@@ -1,9 +1,11 @@
 "use client"
 import { useState, useEffect } from "react";
-import MapboxMap from "../components/MapBox";
+import MapboxMap from "../components/client/MapBox";
 import {styles} from "@/styles/Home.module.css"
 import Link from "next/link";
-import { tracking_LRUCache } from "@/lib/caches/trackings_cache";
+import { tracking_LRUCache } from "@/lib/shared/trackings_cache";
+import { getTrackingsByTimeUID } from "@/lib/shared/db_rpcs";
+import { db_client } from "@/lib/client/client_db";
 
 export default function MapPage() {
   const [geoJSON, setJSON] = useState({type : "FeatureCollection", features: []})
@@ -13,9 +15,6 @@ export default function MapPage() {
   // repeated unnecessary fetches. 
   useEffect(()=> {
     async function fetchTrackings() {
-      const { getTrackingsByTimeUID } = await import("@/lib/db/db_rpcs");
-      const { db_client } = await import("@/lib/db/client_db");
-
       const startTime = `${date} 00:00:00+00`;
       const endTime   = `${date} 23:59:59+00`;
       const UID = 0

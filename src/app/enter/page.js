@@ -1,7 +1,7 @@
 "use client"
 
-import LoginForm from "@/components/LoginForm";
-import RegisterForm from "@/components/RegisterForm";
+import LoginForm from "@/components/client/LoginForm";
+import RegisterForm from "@/components/client/RegisterForm";
 import Link from "next/link";
 import { useState } from "react";
 

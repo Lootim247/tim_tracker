@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react";
-import { login } from "@/lib/db/auth";
+// import { login } from "@/lib/server/auth";
 
 export default function LoginForm() {
     const [pword, setPword] = useState("")
