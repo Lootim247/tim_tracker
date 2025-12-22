@@ -7,7 +7,7 @@
 // latitude   = float
 // user_id    = integer
 
-import { db } from '@/lib/server/server_db'
+import { createServerSupabase } from '@/lib/server/server_db';
 import { haversine } from '@/lib/shared/points'
 
 export default async function handler(req, res) { 
@@ -38,16 +38,14 @@ export default async function handler(req, res) {
         };
 
         const last = acc[acc.length - 1];
-        if (last) {
-          if (DIST_THRESH <= haversine(row.latitude, row.longitude, last.latitude, last.longitude)) {
-            return acc;
-          }
+        if (last && haversine(row.latitude, row.longitude, last.latitude, last.longitude) < DIST_THRESH) {
+          return acc;
         }
-
+        
         acc.push(row);
         return acc;
       }, []);
-
+      const db = createServerSupabase();
       const { error } = await db.from('trackings').insert(filteredRows);
       console.error(error)
       if (error) throw error;
@@ -61,6 +59,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: `Method not authorized` });
-
-  
 }
