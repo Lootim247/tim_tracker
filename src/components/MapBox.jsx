@@ -36,24 +36,68 @@ export default function MapboxMap( {geoJSON} ) {
     // load a mapbox layer using geojson data served from my API endpoint. 
     const load_layer = async () => {
       try {
-        if (map.getSource("geojson-source")) {
-          map.getSource("geojson-source").setData(geoJSON);
+        if (map.getSource("points-source")) {
+          map.getSource("points-source").setData(geoJSON);
+          map.getSource("line-source").setData(geoJSON);
         } else {
-          map.addSource('geojson-source', {
-            'type': 'geojson',
-            'data': geoJSON
+          map.addSource("points-source", {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: geoJSON.features.filter(f => f.geometry.type === "Point")
+            },
+            cluster: true,
+            clusterRadius: 30,
+          });
+
+          map.addSource('line-source', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: geoJSON.features.filter(f => f.geometry.type === "LineString")
+            }
+          });
+
+          map.addLayer({
+            id: "line-layer",
+            type: "line",
+            source: "line-source",
+            filter: ["==", ["geometry-type"], "LineString"],
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#ff0000",
+              "line-width": 4,
+            },
           });
 
           map.addLayer({
             'id': 'circle-layer',
             'type': 'circle',
-            'source': 'geojson-source',
+            'filter': ["all", ["has", "point_count"], ['>', 'point_count', 4]],
+            'source': 'points-source',
             'paint': {
-              'circle-radius': 6,
+              'circle-radius': 15,
               'circle-color': '#007cbf'
             }
           });
+
+          map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'points-source',
+            'filter': ["all", ["has", "point_count"], ['>', 'point_count', 4]],
+            layout: {
+                'text-field': ['get', 'point_count_abbreviated'],
+                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                'text-size': 12
+              }
+          });
+
         }
+        
       } catch (error) {
         console.error('Error fetching data:', error);
         throw error;

@@ -1,6 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
+"use server"
+import { createClient } from "@supabase/supabase-js";
 
-export const db = createClient(
-  process.env.DATABASE_URL,
-  process.env.DATABASE_KEY
-);
+export function createServerSupabase() {
+  const url = process.env.DATABASE_URL;
+  const key = process.env.DATABASE_KEY; // server-only key
+
+  if (!url || !key) {
+    throw new Error("Supabase URL or key is missing");
+  }
+
+  return createClient(url, key);
+}
