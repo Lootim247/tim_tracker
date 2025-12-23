@@ -7,7 +7,7 @@
 // latitude   = float
 // user_id    = integer
 
-import { createServerSupabase } from '@/lib/server/server_db'
+import { createNonAuthServer } from '@/lib/server/server_db'
 import { haversine } from '@/lib/shared/points'
 
 export async function POST(req) {
@@ -63,7 +63,7 @@ export async function POST(req) {
       return acc
     }, [])
 
-    const db = createServerSupabase()
+    const db = createNonAuthServer()
     const { error } = await db.from('trackings').insert(filteredRows)
 
     console.error(error)

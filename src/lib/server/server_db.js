@@ -1,6 +1,7 @@
 "use server";
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers";
 
 export async function createServerSupabase() {
@@ -22,4 +23,11 @@ export async function createServerSupabase() {
       }
     }
   );
+}
+
+export function createNonAuthServer() {
+  return createClient(
+    process.env.DATABASE_URL,
+    process.env.DATABASE_KEY
+  )
 }
