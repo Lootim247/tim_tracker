@@ -63,7 +63,7 @@ export async function POST(req) {
       return acc
     }, [])
 
-    const db = createNonAuthServer()
+    const db = await createNonAuthServer()
     const { error } = await db.from('trackings').insert(filteredRows)
 
     console.error(error)

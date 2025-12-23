@@ -25,7 +25,7 @@ export async function createServerSupabase() {
   );
 }
 
-export function createNonAuthServer() {
+export async function createNonAuthServer() {
   return createClient(
     process.env.DATABASE_URL,
     process.env.DATABASE_KEY
