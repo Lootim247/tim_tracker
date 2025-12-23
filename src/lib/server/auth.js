@@ -2,20 +2,14 @@
 import "server-only"
 import { createServerSupabase } from "@/lib/server/server_db"
 
-export const login = async (email, password) => {
-    return
-}
+// used for testing incoming api routes. Checks if a header contains the 
+// required user
+export async function getAuthenticatedUser(req) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) throw new Error('Missing access token');
 
-export const logout = async (params) => {
-    return
-}
+  const { data: user, error } = await supabase.auth.getUser(token);
+  if (error || !user) throw new Error('Unauthorized');
 
-export async function signup(email, password) {
-    const db = createServerSupabase();
-
-    return db.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: "/tim-tracker" },
-    });
+  return user;
 }

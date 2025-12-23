@@ -1,13 +1,25 @@
-import "server-only"
-import { createClient } from "@supabase/supabase-js";
+"use server";
+import "server-only";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-export function createServerSupabase() {
-  const url = process.env.DATABASE_URL;
-  const key = process.env.DATABASE_KEY; // server-only key
+export async function createServerSupabase() {
+  const cookieStore = await cookies();
 
-  if (!url || !key) {
-    throw new Error("Supabase URL or key is missing");
-  }
-
-  return createClient(url, key);
+  return createServerClient(
+    process.env.DATABASE_URL,
+    process.env.DATABASE_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        }
+      }
+    }
+  );
 }

@@ -1,31 +1,35 @@
 "use client"
 
 import { useState, useTransition } from "react";
-// import { login } from "@/lib/server/auth";
+import { login } from "@/lib/client/auth";
+import { useRouter } from "next/navigation";
+import { db_client } from "@/lib/client/client_db";
 
 export default function LoginForm() {
+    const router = useRouter();
     const [pword, setPword] = useState("")
     const [email, setEmail] = useState("")
     const [error, setError] = useState(null);
     const [isPending, startTransition] = useTransition();
 
-    // validate the users input
-    function validate() {
-        if (!email.includes("@")) {
-        return "Invalid email address";
-        }
-        if (pword.length < 8) {
-        return "Password must be at least 8 characters";
-        }
-        return null;
-    }
+    function handleLogin(e) {
+        e.preventDefault();
+        setError(null);
 
-    async function handleLogin(params) {
-        return
+        startTransition(async () => {
+            const res = await login(email, pword);
+            if (res?.error) {
+                setError(res.error);
+            } else {
+                router.push("/dashboard");
+                router.refresh();
+            }
+        });
     }
 
     return (
         <form onSubmit={handleLogin}>
+            {error && <div>{error}</div>}
             <label>Email</label>
             <input 
                 name="email"
