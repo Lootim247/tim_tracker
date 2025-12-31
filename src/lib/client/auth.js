@@ -1,5 +1,6 @@
 "use client";
 import { db_client } from "./client_db";
+import { signup_rpc } from "../shared/db_rpcs";
 
 /**
  * Login a user with email and password
@@ -54,6 +55,13 @@ export async function signup(email, password) {
     return { data: null, error: customMessage };
   }
 
+  // sign up user if there is no error. use rpc to check existing records then add if not, 
+  // return fail or succeed
+  const signup_res = signup_rpc(db_client, email)
+  if (!signup_res) {
+    return { data, error: null};
+  }
+
   return { data, error: null };
 }
 
@@ -80,6 +88,12 @@ export async function resetPassword(email) {
  * Get the current session and user
  */
 export async function getSession() {
-  const { data, error } = await db_client.auth.getSession();
-  return { data, error };
+  const {data: { session }} = await db_client.auth.getSession();
+  return session;
+}
+
+export async function getUser() {
+  const { data: { user }, error } = await db_client.auth.getUser()
+  if (error) throw error
+  return user
 }

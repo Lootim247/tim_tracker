@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { login } from "@/lib/client/auth";
 import { useRouter } from "next/navigation";
-import { db_client } from "@/lib/client/client_db";
 
 export default function LoginForm() {
     const router = useRouter();

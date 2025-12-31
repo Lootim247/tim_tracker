@@ -1,0 +1,55 @@
+.button {
+    width: 500;
+    height: 50;
+    color: #000;
+    background-color: brown;
+}
+
+.button:hover {
+    background-color: red;
+}
+
+/* SWITCH */
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background-color: #d1d5db; /* gray-300 */
+  cursor: pointer;
+
+  transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.switch.on {
+  background-color: #2563eb; /* blue-600 */
+}
+
+.switch.off {
+  background-color: #d1d5db;
+}
+
+.thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+
+  transition:
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.switch.on .thumb {
+  transform: translateX(20px);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

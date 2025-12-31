@@ -1,13 +1,16 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import MapboxMap from "@/components/client/MapBox";
 import {styles} from "@/styles/Home.module.css"
 import Link from "next/link";
+import { LayoutContext } from "@/components/client/layout-context";
 import { tracking_LRUCache } from "@/lib/shared/trackings_cache";
 import { getTrackingsByTimeUID } from "@/lib/shared/db_rpcs";
 import { db_client } from "@/lib/client/client_db";
 
 export default function MapPage() {
+  const context = useContext(LayoutContext)
+  console.log(context)
   const [geoJSON, setJSON] = useState({type : "FeatureCollection", features: []})
   const [date, setDate] = useState(new Date().toDateString())
 
@@ -17,10 +20,11 @@ export default function MapPage() {
     async function fetchTrackings() {
       const startTime = `${date} 00:00:00+00`;
       const endTime   = `${date} 23:59:59+00`;
-      const UID = 0
+      const UID = 'e6826392-a369-457d-a38f-bc1cd56c700e'
 
       try {
         const data = await getTrackingsByTimeUID(db_client, startTime, endTime, UID);
+        console.log(data)
 
         if (!data || !Array.isArray(data)) {
           console.error("No data returned!")
@@ -79,7 +83,10 @@ export default function MapPage() {
 
   return (
     <div>
+      <div>Your UID is {context.user}</div>
       <Link href="/enter">/login</Link>
+      <Link href="/dashboard/settings">/settings</Link>
+      <Link href="/dashboard/friends">/friend</Link>
       {/* Day changer component */}
       <div>
         <div onClick={() => {changeDay(-1)}}>{'<'}</div>
