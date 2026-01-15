@@ -7,6 +7,8 @@
 // latitude   = float
 // user_id    = uuid
 
+// TODO: Apply filter to remove timestamps that are longer than an hour old
+
 import { createNonAuthServer } from '@/lib/server/server_db'
 import { AuthenticateKey } from '@/lib/shared/db_rpcs'
 import { hashApiKey } from '@/lib/shared/APIkey'
@@ -22,10 +24,8 @@ export async function POST(req) {
   const rawKey = authHeader?.split(' ')[1]
   if (!rawKey) return Response.json({ error: 'Unauthorized' }, { status: 401 })
   const hashedKey = hashApiKey(rawKey)
+  console.log(hashedKey)
 
-
-  // needs to authenticate for each row. Must also not allow the user to choose the user_id
-  // this should instead be given by the validation function (returning user_id)
   try {
     const body = await req.json()
     const data = body.locations
@@ -64,7 +64,10 @@ export async function POST(req) {
     const userCache = {};
     for (const row of filteredRows) {
       if (!userCache[row.device_id]) {
+        console.log(row.device_id)
+        console.log(hashedKey)
         const user_id = await AuthenticateKey(db, row.device_id, hashedKey);
+        console.log(user_id)
         if (!user_id) {
           return Response.json(
             { error: 'Unauthorized' },
@@ -77,9 +80,9 @@ export async function POST(req) {
       delete row.device_id;
     }
     
+    console.log('hi')
     const { error } = await db.from('trackings').insert(filteredRows)
-
-    console.error(error)
+    if (error) console.error("insert error:" + error.message)
     if (error) throw error
 
     // OVERLAND client expects result ok

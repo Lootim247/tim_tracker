@@ -32,7 +32,7 @@ export async function newAPIkey(user_id, db) {
 
     const { data, error } = await db
         .from("users")
-        .update({hashed_API_insert_key : hashed})
+        .update({hashed_api_insert_key : hashed})
         .eq("id", user_id)
         .select("id")
         .single()

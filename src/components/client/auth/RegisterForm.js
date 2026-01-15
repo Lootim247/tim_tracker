@@ -7,6 +7,7 @@ export default function RegisterForm() {
     const [pword, setPword] = useState("")
     const [confirmPW, setConfirmPW] = useState("")
     const [email, setEmail] = useState("")
+    const [title, setTitle] = useState("")
     const [error, setError] = useState(null);
     const [isPending, startTransition] = useTransition();
 
@@ -38,7 +39,7 @@ export default function RegisterForm() {
 
         startTransition(async () => {
             console.log("trying signup")
-            const res = await signup(email, pword);
+            const res = await signup(title, email, pword);
             console.log("done signup")
             if (res?.error) {
                 console.log(res.error)
@@ -60,7 +61,17 @@ export default function RegisterForm() {
                     required
                 />
 
-                <label>password</label>
+                <label>Title</label>
+                <label>Other users will see this title</label>
+                <input 
+                    type="name" 
+                    name="title"
+                    onChange={(e)=>{setTitle(e.target.value)}}
+                    placeholder="Enter your preferred title." 
+                    required
+                />
+
+                <label>Password</label>
                 <input 
                     type="password" 
                     name="password"

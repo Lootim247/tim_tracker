@@ -1,6 +1,12 @@
 import Link from "next/link";
 
 export default function HomePage() {
+    /*
+    * TODO:
+    *   - Much better styling
+    *   - Link to login page
+    *   - Should show some static images of application working
+    */
     return (
         <div>
             <h1>Welcome to Tim Tracker!</h1>

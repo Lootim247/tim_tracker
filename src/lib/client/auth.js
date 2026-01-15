@@ -41,7 +41,7 @@ export async function logout() {
  * Sign up a new user with email and password
  * Returns user data if successful
  */
-export async function signup(email, password) {
+export async function signup(title, email, password) {
   const { data, error } = await db_client.auth.signUp({
     email,
     password,
@@ -57,7 +57,7 @@ export async function signup(email, password) {
 
   // sign up user if there is no error. use rpc to check existing records then add if not, 
   // return fail or succeed
-  const signup_res = signup_rpc(db_client, email)
+  const signup_res = signup_rpc(db_client, email, title)
   if (!signup_res) {
     return { data, error: null};
   }

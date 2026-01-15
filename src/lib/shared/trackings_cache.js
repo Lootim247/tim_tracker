@@ -14,7 +14,7 @@ export const tracking_LRUCache = {
             store.data.push(saved);
             return saved.value
         }
-        throw "No matching data"
+        return null;
     },
     
     // set a value, place it in the top spot
@@ -23,12 +23,6 @@ export const tracking_LRUCache = {
             store.data.shift()
         }
         store.data.push({"key": key, "value": value})
-        notify()
-    },
-
-    // reset cache completely 
-    clear() {
-        store.data.clear()
         notify()
     },
 

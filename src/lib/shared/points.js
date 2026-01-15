@@ -21,3 +21,38 @@ export function haversine(lat1, lon1, lat2, lon2) {
 
     return distance;
 }
+
+export function trackingsToFeatureCollection(data) {
+    if (!data || !Array.isArray(data)) {
+        console.error("No data returned!")
+        setJSON({type : "FeatureCollection", features: []})
+        return null;
+    }
+    
+    const json_feat = {
+        type: "FeatureCollection",
+        features: [
+        ...data.map(element => ({
+            type : "Feature",
+            geometry : {
+            type        : "Point",
+            coordinates : [element.longitude, element.latitude]
+            },
+            properties: {
+            kind: "point"
+            }
+        })),
+
+        {type : "Feature",
+        geometry: {
+            type: "LineString",
+            coordinates: data.map(p => [p.longitude, p.latitude])
+        },
+        properties: {
+            kind: "path"
+        }}
+        ]
+    }
+
+    return json_feat;
+}

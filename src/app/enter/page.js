@@ -3,11 +3,13 @@
 import LoginForm from "@/components/client/auth/LoginForm";
 import RegisterForm from "@/components/client/auth/RegisterForm";
 import ResetPasswordPage from "@/components/client/auth/ResetPassword";
-import Link from "next/link";
 import { useState } from "react";
-import { logout } from "@/lib/client/auth";
 
 export default function UserEnter() {
+    /* TODO:
+        This page does not allow you to reset your password. 
+        Create an auxilary page and set up the reset password email through Supabase
+    */
     const [page, setPage] = useState("login")
     return (
         <div>
@@ -30,20 +32,6 @@ export default function UserEnter() {
                 <ResetPasswordPage/>
                 <p>Already have an account? <b onClick={()=>{setPage("login")}}> login</b></p>
             </div>}
-            <b
-                onClick={async () => {
-                    try {
-                    console.log("starting logout")
-                    await logout();
-                    // Optionally reset page state or redirect
-                    setPage("login"); // if you want to go back to login page
-                    } catch (err) {
-                    console.error("Logout failed:", err);
-                    }
-                }}
-            >
-            logout
-            </b>
         </div>
     );
 }
