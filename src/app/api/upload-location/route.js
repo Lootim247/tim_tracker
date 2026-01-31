@@ -13,20 +13,21 @@ import { createNonAuthServer } from '@/lib/server/server_db'
 import { AuthenticateKey } from '@/lib/shared/db_rpcs'
 import { hashApiKey } from '@/lib/shared/APIkey'
 import { haversine } from '@/lib/shared/points'
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
+
 
 export async function POST(req) {
   // equivalent to 10 meters
   const DIST_THRESH = 0.01
   const db = await createNonAuthServer()
 
-  // --- Auth header ---
-  const authHeader = req.headers.get('authorization')
-  const rawKey = authHeader?.split(' ')[1]
-  if (!rawKey) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  const hashedKey = hashApiKey(rawKey)
-  console.log(hashedKey)
-
-  try {
+  async function processOverlandRequest(req) {
+    const authHeader = req.headers.get('authorization')
+    const rawKey = authHeader?.split(' ')[1]
+    if (!rawKey) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const hashedKey = hashApiKey(rawKey)
     const body = await req.json()
     const data = body.locations
     const num_data = data?.length
@@ -85,14 +86,76 @@ export async function POST(req) {
     if (error) console.error("insert error:" + error.message)
     if (error) throw error
 
-    // OVERLAND client expects result ok
     return Response.json({ result: 'ok' }, { status: 200 })
-  } catch (err) {
-    console.error('Server error:' + err.message)
-    return Response.json(
-      { error: 'Server error:' + err.message },
-      { status: 500 }
-    )
+  }
+
+  async function processOwntrackRequest(req) {
+    const body = await req.json()
+    if (body._type != "location") {
+      return Response.json({ result: 'ok' }, { status: 200 })
+    }
+    console.log('here')
+
+    const rawKey = req.headers.get('php-auth-pw')
+    const user = req.headers.get('php-auth-user')
+
+    console.log(rawKey)
+    console.log(user)
+    if (!rawKey || !user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const hashedKey = hashApiKey(rawKey)
+
+    const db = await createNonAuthServer();
+    console.log(user)
+    console.log(hashedKey)
+    const user_id = await AuthenticateKey(db, user, hashedKey)
+
+    if (!user_id) {
+      return Response.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const row = {
+      longitude: body.lon,
+      latitude: body.lat,
+      created_at: dayjs.unix(body.created_at).toISOString(),
+      user_id: user_id,
+    };
+
+    const { error } = await db.from('trackings').insert(row)
+    if (error) console.error("insert error:" + error.message)
+    if (error) throw error
+    
+    console.log('after error')
+
+    return Response.json({ result: 'ok' }, { status: 200 });
+  }
+
+  // get sender type. Support only owntracks and overland
+  const agent = req.headers.get('user-agent');
+  if (agent.slice(0, 8).toLowerCase() == 'overland') {
+    try {
+      return await processOverlandRequest(req);
+    } catch (err) {
+      console.error('Server error:' + err.message)
+      return Response.json(
+        { error: 'Server error:' + err.message },
+        { status: 500 }
+      )
+    } 
+  } else if (agent.slice(0,9).toLowerCase() == 'owntracks') {
+    try {
+      return await processOwntrackRequest(req);
+    } catch (err) {
+      console.error('Server error:' + err.message)
+      return Response.json(
+        { error: 'Server error:' + err.message },
+        { status: 500 }
+      )
+    }
+  } else {
+    return Response.json({ error: 'Sender agent format not accepted' }, { status: 401 })
   }
 }
 

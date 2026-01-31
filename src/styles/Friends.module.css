@@ -13,22 +13,140 @@
   vertical-align: middle;
 }
 
+.Table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.Row {
+    width: 100%;
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.RowChanged {
+    width: 100%;
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.Row div,.RowChanged div {
+    padding: 10px;
+    display: flex;
+    height: 45px;
+    align-items: center;
+    justify-content: center;
+}
+
+.RowChanged .FirstCol {
+    border: 1px solid yellow;
+}
+
+.TableHeader {
+    width: 100%;
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.TableHeader div {
+    padding: 10px;
+    display: flex;
+    height: 45px;
+    align-items: center;
+    justify-content: center;
+}
+
+.FirstCol {
+    background-color: #addefa;
+    border-radius: 10px 0px 0px 10px;
+    border: 1px solid #8bb1d5;
+    border-top: 3px solid #8bb1d5;
+    border-bottom: 3px solid #8bb1d5;
+}
+
+.Col {
+    background-color: #addefa;
+    border: 1px solid #8bb1d5;
+    border-top: 3px solid #8bb1d5;
+    border-bottom: 3px solid #8bb1d5;
+}
+
+.LastCol {
+    background-color: var(--reject-background);
+    border-radius: 0px 10px 10px 0px;
+    border: 1px solid var(--reject-border);
+    border-top: 3px solid var(--reject-border);
+    border-bottom: 3px solid var(--reject-border);
+}
+
+.LastCol:hover {
+    color: #000;
+    background-color: var(--reject-hover);
+}
+
+.RemoveButton {
+    background-color: var(--reject-background);
+}
+
+.AcceptButton{
+    color: black;
+    background-color: var(--accept-background);
+}
+
 .Wrapper {
+    justify-content: center;
+    align-items: center;
     display: flex;
     flex: 1;
     flex-direction: column;
 }
 
 .Content {
+    padding: 20px 10px;
     flex: 1;
     display: flex;
+    width: 80%;
     flex-direction: column;
+    gap: 40px;
+}
+
+.FriendRequest {
+    display: flex;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    border-top: 3px solid #eee;
+    border-bottom: 3px solid #eee;
+    padding: 15px 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.FriendRequest div {
+    display: flex;
+    gap: 10px;
+}
+
+.NotificationBox {
+    border-radius: 12px;
+    background-color: white;
+    padding: 15px 10px;
+    border: 1px solid #eee;
+    border-top: 3px solid #eee;
+    border-bottom: 3px solid #eee;
+    width: 100%;
 }
 
 .BottomBar {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    gap: 60%;
     height: 60px;
     border-top: 1px solid #eee;
 }

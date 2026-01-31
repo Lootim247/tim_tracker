@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { login } from "@/lib/client/auth";
 import { useRouter } from "next/navigation";
+import styles from '@/styles/Enter.module.css'
 
 export default function LoginForm() {
     const router = useRouter();
@@ -27,9 +28,9 @@ export default function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleLogin}>
+        <form className={styles.Form} onSubmit={handleLogin}>
             {error && <div>{error}</div>}
-            <label>Email</label>
+            <label>Email:</label>
             <input 
                 name="email"
                 placeholder="Enter your email." 
@@ -37,7 +38,7 @@ export default function LoginForm() {
                 required
             />
 
-            <label>Password</label>
+            <label>Password:</label>
             <input 
                 type="password"
                 name="password"
@@ -45,7 +46,7 @@ export default function LoginForm() {
                 placeholder="Enter your password." 
                 required
             />
-            <button type="submit">Login</button>
+            <button className={styles.SubmitButton} type="submit">Login</button>
         </form>
     );
 }

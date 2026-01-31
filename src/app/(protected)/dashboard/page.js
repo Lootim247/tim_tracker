@@ -2,6 +2,11 @@
 import styles from '@/styles/Home.module.css'
 import { LayoutContext, HomeProvider, HomeContext } from '@/components/client/contexts'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 import { useState, useContext, useEffect, useRef } from 'react'
 import { DateSelectorTT } from '@/components/client/ui'
 import { UserSelector,SideBar } from '@/components/client/home_ui'
@@ -13,7 +18,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { db_client } from '@/lib/client/client_db'
 import { trackingsToFeatureCollection } from '@/lib/shared/points'
-import { getTrackingsByTimeUID } from '@/lib/shared/db_rpcs'
+import { getTrackingsByTimeUID1 } from '@/lib/shared/db_rpcs'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -23,7 +28,7 @@ export default function HomePage() {
     const mapRef = useRef(null);
     
     const [date, setDate] = useState(() => dayjs());
-    const [user, setUser] = useState(context.user);
+    const [user, setUser] = useState(null);
     const [barPos, setBarPos] = useState(0);
     const [sideBar, setSideBar] = useState(true);
     const [mapPos, setMapPos] = useState({longitude: 0, latitude : 0})
@@ -31,7 +36,7 @@ export default function HomePage() {
 
     console.log("All States:")
     console.log(`
-        user : ${user}
+        user : ${user?.friend_id}
         date : ${date}
         barPos : ${barPos}
         Side Bar Open : ${sideBar}
@@ -54,7 +59,6 @@ export default function HomePage() {
 
     // update what data is shown on the map
     useEffect(() => {
-        console.log("run")
         if (!mapLoaded) return;
 
         if (!user) {
@@ -70,23 +74,33 @@ export default function HomePage() {
                 return `${date}-${user}`
             }
 
-            const cached = tracking_LRUCache.get(key(date, user));
+            const cached = tracking_LRUCache.get(key(date, user.friend_id));
             let data = cached;
 
             if (!data) {
-                const startTime = `${date.format("YYYY-MM-DD")} 00:00:00+00`;
-                const endTime   = `${date.format("YYYY-MM-DD")} 23:59:59+00`;
+                const tz = dayjs.tz.guess()
+
+                const startTime = dayjs
+                    .tz(date, tz)
+                    .startOf('day')
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss+00')
+
+                const endTime = dayjs
+                    .tz(date, tz)
+                    .endOf('day')
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss+00')
 
                 try {
-                    const trackings = await getTrackingsByTimeUID(
-                    db_client,
-                    startTime,
-                    endTime,
-                    user
+                    const trackings = await getTrackingsByTimeUID1(
+                        db_client,
+                        startTime,
+                        endTime,
                     );
 
                     data = trackingsToFeatureCollection(trackings);
-                    tracking_LRUCache.set(key(date, user), data);
+                    tracking_LRUCache.set(key(date, user.friend_id), data);
                 } catch (err) {
                     console.error(err);
                     data = { type: "FeatureCollection", features: [] };
@@ -122,7 +136,6 @@ export default function HomePage() {
                         
             (hamburger menu must be moved to bottom bar or be activated conditionally only on home page) */}
             {sideBar?<div className={styles.SideBar}>
-                {sideBar? 'Sidebar Open': 'Sidebar Closed'}
                 <SideBar/>
             </div> : <></>}
 

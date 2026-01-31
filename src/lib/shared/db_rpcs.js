@@ -10,12 +10,28 @@ export async function getTrackingsByTimeUID(DB_client, timestamp1, timestamp2, u
     return data
 }
 
+export async function getTrackingsByTimeUID1(DB_client, timestamp1, timestamp2) {
+    const { data, error } = await DB_client.rpc("get_trackings_by_time", {
+        start_time: timestamp1,
+        end_time: timestamp2
+    })
+    if (error) throw error
+    return data
+}
+
+
 export async function getRelatedUsers(DB_client, user_id) {
-    const { data, error } = await DB_client.rpc("get_related_users", {
-        user_id: user_id        
-    });
+    const { data, error } = await DB_client.rpc("get_related_users", {});
     if (error) throw error;
     return data;
+}
+
+export async function getRelatedStories(DB_client) {
+    const {data, error} = await DB_client.rpc("get_related_stories", {});
+    console.log(data)
+    console.log(error)
+    if (error) throw error
+    return data
 }
 
 export async function addFriendEmail(DB_client, user_id, friend_email) {
@@ -74,4 +90,26 @@ export async function UpdateSharingBatch(DB_client, payload) {
     }
 
     return fail_arr;
+}
+
+export async function UpdateStoryGroup(DB_client, story_id, update_id, action) {
+    if (action != 'remove' || action != 'add') {
+        throw new Error('Action prompt is not remove or add')
+    }
+    
+    if (action == "remove") {
+        const { data, error } = await DB_client
+        .from('user_story')
+        .delete()
+        .eq("user_id", update_id) 
+        .eq("story_id", story_id)
+    } else if (action == "add") {
+        const { data, error } = await DB_client
+        .from('user_story')
+        .insert([
+            {user_id : update_id, story_id : story_id}
+        ])
+        .select()
+    }
+    
 }

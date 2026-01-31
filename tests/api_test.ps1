@@ -21,7 +21,7 @@ $body = @{
                 locations_in_payload = 1
                 battery_state = "charging"
                 battery_level = 0.80
-                device_id = "tpanilai@tufts.edu"
+                device_id = "tpanilai@gmail.com"
                 wifi = ""
             }
         }
@@ -30,8 +30,26 @@ $body = @{
 
 
 $headers = @{
-    "Authorization" = "Bearer tt-g1Ww-I5pX-dHNp-za3X-Yfas"
+    "Authorization" = "Bearer tt-bsZh-fnwa-t8Y0-etFb-Y4MW"
     "Content-Type" = "application/json"
 }
 
-Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/location_end" -Method POST -Body $body -Headers $headers
+$body2 = @{
+        _type = 'location'
+        created_at = 1769852570
+        lon = 114.2640707
+        lat = 22.3380551
+} | ConvertTo-Json
+
+
+$headers2 = @{
+    "authorization" = "Basic dHBhbmlsYWlAZ21haWwuY29tOnR0LXFHSTgtaEhPWC1qN3FHLXM5U04tTXUwYQ=="
+    "user-agent" = 'Owntracks-Android/gms/420505020'
+    "Content-Type" = "application/json"
+    "php-auth-user" = "tpanilai@gmail.com"
+    "php-auth-pw" = "tt-bsZh-fnwa-t8Y0-etFb-Y4MW"
+}
+
+
+# Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body2 -Headers $headers2

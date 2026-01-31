@@ -11,7 +11,8 @@
 
 .TabContainer {
     display: flex;
-    height: 60px;
+    min-height: 60px;
+    height: 15%;
     border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
@@ -31,4 +32,25 @@
 
 .Tab {
     background-color: green;
+}
+
+.Tooltip {
+    position: relative;
+}
+
+.Tooltip:hover .TooltipText {
+    visibility: visible;
+    position: absolute;
+    top: 0px;
+    left: 35px;
+    width: 180px;
+    padding: 4px;
+    border-radius: 5px;
+    background-color: aliceblue;
+    border: 2px solid black;
+}
+
+.TooltipText {
+    position: absolute;
+    visibility: hidden;
 }

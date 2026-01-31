@@ -1,12 +1,20 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accept-background: green;
+  --accept-border: #8bb1d5;
+  --accept-hover: green;
+  --reject-background: #ff7272;
+  --reject-border: red;
+  --reject-hover: red;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accept-background: #addefa;
+    --accept-border: #8bb1d5;
   }
 }
 

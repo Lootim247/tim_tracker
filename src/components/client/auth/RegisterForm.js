@@ -2,6 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { signup } from "@/lib/client/auth";
+import { Tooltip } from "../ui";
+import styles from '@/styles/Enter.module.css'
+import { LabelOff } from "@mui/icons-material";
 
 export default function RegisterForm() {
     const [pword, setPword] = useState("")
@@ -49,47 +52,52 @@ export default function RegisterForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Email</label>
-                {error && <div>{error}</div>}
-                <input 
-                    type="email" 
-                    name="email"
-                    onChange={(e)=>{setEmail(e.target.value)}}
-                    placeholder="Enter your email." 
-                    required
-                />
+        <form className={styles.Form} onSubmit={handleSubmit}>
+            <label>Email:</label>
+            {error && <div>{error}</div>}
+            <input 
+                type="email" 
+                name="email"
+                onChange={(e)=>{setEmail(e.target.value)}}
+                placeholder="Enter your email." 
+                required
+            />
 
-                <label>Title</label>
-                <label>Other users will see this title</label>
-                <input 
-                    type="name" 
-                    name="title"
-                    onChange={(e)=>{setTitle(e.target.value)}}
-                    placeholder="Enter your preferred title." 
-                    required
+            <div className={styles.TipLabel}>
+                <label>Title:</label>
+                <Tooltip 
+                    tip={'Other users will see this title.'}
+                    width={10}
+                    height={10}
                 />
-
-                <label>Password</label>
-                <input 
-                    type="password" 
-                    name="password"
-                    onChange={(e)=>{setPword(e.target.value)}}
-                    placeholder="Enter your password." 
-                    required
-                />
-
-                <label>Confirm Password</label>
-                <input 
-                    type="password" 
-                    name="confirmassword"
-                    onChange={(e)=>{setConfirmPW(e.target.value)}}
-                    placeholder="Confirm your password." 
-                    required
-                />
-                <button type="submit">Sign up</button>
             </div>
+            <input 
+                className={styles.Input}
+                type="name" 
+                name="title"
+                onChange={(e)=>{setTitle(e.target.value)}}
+                placeholder="Enter your preferred title." 
+                required
+            />
+
+            <label>Password:</label>
+            <input 
+                type="password" 
+                name="password"
+                onChange={(e)=>{setPword(e.target.value)}}
+                placeholder="Enter your password." 
+                required
+            />
+
+            <label>Confirm Password:</label>
+            <input 
+                type="password" 
+                name="confirmPassword"
+                onChange={(e)=>{setConfirmPW(e.target.value)}}
+                placeholder="Confirm your password." 
+                required
+            />
+            <button className={styles.SubmitButton} type="submit">Sign up</button>
         </form>
     );
 }

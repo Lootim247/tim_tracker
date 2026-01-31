@@ -16,6 +16,12 @@
     border-right: 1px solid #eee;
 }
 
+.SideBarContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .sideBarPlaceholder{
     width: 30%;
 }
@@ -44,6 +50,12 @@
 .Map {
     flex: 1;
     overflow: auto;
+}
+
+.UserCard {
+    display: block;
+    width: 45px;
+    height: 45px;
 }
 
 .hidden {

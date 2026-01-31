@@ -70,18 +70,15 @@ export function DateSelectorTT({value, onChange }) {
     )
 }
 
-export function Tooltip({tip, width, height}) {
-    const [open, setOpen] = useState(false);
-    
+export function Tooltip({tip, width, height}) {    
     return (
-        <div>
-            {open && <p>OPEN</p>}
+        <div className={styles.Tooltip}>
+            <div className={styles.TooltipText}> {tip} </div>
             <Image 
-            src={'/icons/info.svg'}
+            src={'icons/info.svg'}
             width={width}
             height={height}
-            alt='tip'
-            onClick={()=>{setOpen(!open)}}/>
+            alt='tip'/>
         </div>
     )
 }
@@ -114,6 +111,18 @@ export function SignedImage({ owner, type, width, height }) {
   );
 }
 
+// export function ProfilePhoto({ owner, type, width, height }) {
+//     return (
+//         <div className={styles.ImageWrapper}>
+//             <SignedImage
+//             owner={owner}
+//             type={type}
+//             width={width}
+//             height={height}/>
+//         </div>
+        
+//     )
+// }
 
 export function ButtonTT({onclick, text}){
     return (<button className={styles.button} onClick={()=>{onclick()}}>{text}</button>)

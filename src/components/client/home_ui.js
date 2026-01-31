@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { LayoutContext, HomeContext } from "./contexts";
+import { SignedImage } from "./ui";
 import styles from '@/styles/Home.module.css'
 
 
@@ -11,21 +12,24 @@ export function UserSelector({maxItems}) {
     const homeContext = useContext(HomeContext);
     const layoutContext = useContext(LayoutContext)
 
-    const user_list = layoutContext.friends.accepted
+    const user_list = layoutContext.friends?.accepted
     
     if (!user_list || user_list.length == 0) {
         return <div>No users</div>
     }
     const max_pos = Math.trunc(user_list.length / maxItems)
 
-    function UserCard({UserId, name}) {
+    function UserCard({user_obj}) {
         let style = styles.Tab
-        if (homeContext.user.get == UserId) {
+        if (homeContext.user.get == user_obj.friend_id) {
             style = styles.ActiveTab
         }
         return (
-            <div onClick={()=>homeContext.user.set(UserId)}>
-                {UserId}
+            <div 
+            className={styles.UserCard}
+            onClick={()=>homeContext.user.set(user_obj)}>
+                <SignedImage owner={user_obj.friend_id} type={'profile-picture'} width={30} height={30}/>
+                {user_obj.title}
             </div>
         )
     }
@@ -38,8 +42,7 @@ export function UserSelector({maxItems}) {
             {user_list.slice(start, end).map(item => (
                 <UserCard
                     key={item.friend_id} 
-                    UserId={item.friend_id}
-                    name={'tbd'}
+                    user_obj={item}
                     />
             ))}
             {homeContext.barPos.get != max_pos && max_pos > 0 &&
@@ -51,7 +54,7 @@ export function UserSelector({maxItems}) {
 export function SideBar() {
     const homeContext = useContext(HomeContext)
     const layoutContext = useContext(LayoutContext)
-    const friend = layoutContext.friends.accepted.find((x)=> x == homeContext.user.get)
+    const user_obj = homeContext.user.get
 
     // TODO: get all recent stories for this specific user. (cache?)
     // TODO: Get profile pictures and other items for the user
@@ -59,11 +62,16 @@ export function SideBar() {
     const stories = [
         {id:1, title:'story'}, {id:2, title:'story2'}, {id:3, title:'story3'}
     ]
+    console.log(user_obj)
     
+    if (!user_obj) return (<></>)
+
+    
+    console.log(user_obj)
     return (
-        <div>
-            <div>Title</div>
-            <div>Profile Pic</div>
+        <div className={styles.SideBarContent}>
+            <div>{user_obj.title}</div>
+            <SignedImage owner={user_obj.friend_id} type={'profile-picture'} width={100} height={100}/>
             <div>Available Stories</div>
             {stories.map(story => (
                 <div key={story.id}>{story.title}</div>

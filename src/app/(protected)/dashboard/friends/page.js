@@ -1,32 +1,74 @@
 "use client"
-import { useState, useEffect, useTransition, useContext } from "react"
+import { useState, useEffect, useTransition, useContext, useRef } from "react"
 import { LayoutContext } from "@/components/client/contexts"
 import { db_client } from "@/lib/client/client_db"
 import { useRouter } from "next/navigation"
 import { SwitchTT, Tooltip } from "@/components/client/ui"
 import { addFriendEmail, UpdateSharingBatch } from "@/lib/shared/db_rpcs"
+import { SignedImage } from "@/components/client/ui"
 import styles from '@/styles/Friends.module.css'
+import { RowingSharp } from "@mui/icons-material"
+import { ListItem } from "@mui/material"
 
-export function FriendCard( {friend_id, youShare, theyShare, addUpdate} ) {
-    const [userShare, setUserShare] = useState(youShare);
+export function FriendRequest( {name, friend_id} ) {
+    return (
+        <div className={styles.FriendRequest}>
+            {name}
+            <div>
+                <button className={styles.RemoveButton}>X</button>
+                <button className={styles.AcceptButton}>Accept</button>
+            </div>
+        </div>
+    )
+}
 
-    function handleChange(value) {
-        setUserShare(value)
-        addUpdate(friend_id, value)
+export function CustomTable({rows, appendUpdate}) {
+    function Row( {friend_id, title, youShare, theyShare, addUpdate } ) {
+        const startRef = useRef(youShare);
+        const [userShare, setUserShare] = useState(youShare);
+        
+        function handleChange(value) {
+            setUserShare(value)
+            // addUpdate(friend_id, value)
+        }
+        
+        return (
+            <div className={startRef.current === userShare ? styles.Row : styles.RowChanged}>
+                <div style={{width : '40%'}} className={styles.FirstCol}>{title}</div>
+                <div style={{width : '20%'}} className={styles.Col}>
+                    <SwitchTT
+                    value={userShare}
+                    onChange={handleChange}/>
+                </div>
+                <div style={{width : '20%'}} className={styles.Col}>
+                    {theyShare? "True" : "False"}
+                </div>
+                <div style={{width : '20%'}} className={styles.LastCol}>
+                    Remove friend
+                </div>
+            </div>
+        )
     }
 
     return (
-        <tr className={styles.FriendRow}>
-            <td>{friend_id}</td>
-            <td>
-                <SwitchTT
-                    value={userShare}
-                    onChange={handleChange}/>
-            </td>
-            <td>{theyShare? "True" : "False"}</td>
-            <td><button>Remove friend</button></td>
-        </tr>
-    )
+        <div className={styles.Table}>
+            <div className={styles.TableHeader}>
+                <div style={{ width: "40%" }}>Username <Tooltip width={30} height={30} tip={'hi'}/></div>
+                <div style={{ width: "20%" }}>Share Location</div>
+                <div style={{ width: "20%" }}>Receive Location</div>
+                <div style={{ width: "20%" }}></div>
+            </div>
+            {rows.map((row, i)=> (
+                <Row
+                key={i}
+                title={row.title}
+                friend_id={row.friend_id}
+                addUpdate={appendUpdate}
+                youShare={row.user_shares}
+                theyShare={row.friend_shares}/>
+            ))}
+        </div>
+    ) 
 }
 
 export default function FriendPage() {
@@ -39,6 +81,34 @@ export default function FriendPage() {
     */
     const router = useRouter();
     const context = useContext(LayoutContext)
+    
+
+    // test context:
+    // const context = {
+    //     user : null,
+    //     friends : {
+    //         accepted : [
+    //             {
+    //                 title : "tim",
+    //                 friend_id : 1,
+    //                 user_shares : true,
+    //                 friend_shares : true
+    //             },
+    //             {
+    //                 title : "ray",
+    //                 friend_id : 2,
+    //                 user_shares : true,
+    //                 friend_shares : true
+    //             }
+    //         ],
+    //         received : [
+    //             {
+    //                 title : 'guy',
+    //                 friend_id : 3
+    //             }
+    //         ]
+    //     }
+    // }
     const [email, setEmail] = useState("")
     const [error, setError] = useState(null);
     const [isPending, startTransition] = useTransition();
@@ -73,10 +143,6 @@ export default function FriendPage() {
         };
     }, []);
 
-
-
-    // TODO: Make it so flipping a switch is not an immediate database entry and instead saves on page exits
-
     useEffect(() => {
         const handleBeforeUnload = (event) => {
             if (updates.size !== 0) {
@@ -86,7 +152,6 @@ export default function FriendPage() {
 
         window.addEventListener('beforeunload', handleBeforeUnload);
     }, [updates])
-
 
     function handleAddFriend(e) {
         e.preventDefault();
@@ -105,35 +170,22 @@ export default function FriendPage() {
         <div className={styles.Wrapper}>
         
         <div className={styles.Content}>
-            {context.friends.accepted.length > 0  && 
-                <table className={styles.FriendTable}>
-                <colgroup>
-                <col style={{ width: "30%" }}/><col style={{ width: "15%" }}/><col style={{ width: "20%" }}/><col style={{ width: "15%" }}/>
-                </colgroup>
-                <thead>
-                    <tr className={styles.FriendRow}>
-                        <th>Username</th>
-                        <th>Share Location</th>
-                        <th>Receiving Location</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {context.friends.accepted.map((friend, i) => (
-                        <FriendCard 
-                            key={i}
-                            friend_id={friend.friend_id}
-                            addUpdate={appendUpdate}
-                            youShare={friend.user_shares}
-                            theyShare={friend.friend_shares}
-                        />
-                    ))}
-                </tbody></table>}
+            {context.friends?.accepted?.length > 0  && <CustomTable rows={context.friends.accepted} appendUpdate={appendUpdate}/>}
 
-            {context.friends.received.length > 0  && 
-            <div>hi</div>}
+            {(context.friends?.accepted?.length == 0 || !context.friends?.accepted) &&
+            <div className={styles.NotificationBox}>No friends yet! Add some using email!</div>}
 
-            <Tooltip tip={'gh'} width={100} height={100}/>
+            {context.friends?.received?.length > 0  && 
+            context.friends.received.map((friend, i) => (
+                <FriendRequest
+                    key={i}
+                    name={friend.title}
+                    friend_id={friend.friend_id}
+                />
+            ))}
+
+            {(context.friends?.received?.length == 0 || !context.friends?.received) &&
+            <div className={styles.NotificationBox}>No friend requests.</div>}
         </div>
         <div className={styles.BottomBar}>
             <form onSubmit={handleAddFriend}>

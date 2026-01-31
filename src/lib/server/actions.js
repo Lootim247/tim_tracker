@@ -3,8 +3,7 @@ import "server-only"
 import { createServerSupabase } from "./server_db";
 import { newAPIkey } from "../shared/APIkey";
 import { getAuthenticatedUser } from "./auth";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { GetObjectCommand } from "@aws-sdk/client-s3"
+import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { s3Client } from "./s3_server";
 // server action
 export async function newAPIkeyAction() {
@@ -22,6 +21,26 @@ export async function newAPIkeyAction() {
     }
 }
 
+export async function putImage(type, bucket, image) {
+  const supabase = await createServerSupabase()
+
+  const { data, error } = await supabase.rpc("put_image", {
+    type: type,
+    bucket: bucket
+  });
+
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: data,
+    Body: image
+  });
+
+  const response = await s3Client.send(command);
+
+  if (error || !data) {
+    throw new Error("Failed to add")
+  }
+}
 
 export async function getImage(owner_id, type) {
   const supabase = await createServerSupabase()
