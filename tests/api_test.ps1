@@ -52,5 +52,5 @@ $headers2 = @{
 }
 
 
-Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body -Headers $headers
-# Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body2 -Headers $headers2
+# Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body2 -Headers $headers2
