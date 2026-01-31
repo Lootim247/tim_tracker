@@ -32,6 +32,7 @@ $body = @{
 $headers = @{
     "Authorization" = "Bearer tt-bsZh-fnwa-t8Y0-etFb-Y4MW"
     "Content-Type" = "application/json"
+    "user-agent" = 'Overland/1.3 (iPhone; iOS 26.2; Scale/3.00)'
 }
 
 $body2 = @{
@@ -51,5 +52,5 @@ $headers2 = @{
 }
 
 
-# Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body -Headers $headers
-Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body2 -Headers $headers2
+Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body -Headers $headers
+# Invoke-RestMethod -Uri "http://localhost:3000/tim-tracker/api/upload-location" -Method POST -Body $body2 -Headers $headers2
