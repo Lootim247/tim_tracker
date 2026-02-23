@@ -18,20 +18,34 @@ export default function UserEnter() {
             <div className={styles.Content}>
                 <h1 className={styles.CenteredRow}>Login</h1>
                 <LoginForm/>
-                <p>Don`t have an account? <b onClick={()=>{setPage("signup")}}> Signup.</b></p>
-                <p>Forgot your password? <b onClick={()=>{setPage("resetpw")}}> Reset Password.</b></p>
+                <div className={styles.Links}>
+                    <p>Don`t have an account? <b onClick={()=>{setPage("signup")}}> Signup.</b></p>
+                    <p>Forgot your password? <b onClick={()=>{setPage("resetpw")}}> Reset Password.</b></p>
+                </div>
             </div>
-            : page === "signup"? 
+            : page === "signup" ? 
             <div className={styles.Content}>
                 <h1 className={styles.CenteredRow}>Signup</h1>
-                <RegisterForm/>
-                <p>Already have an account? <b onClick={()=>{setPage("login")}}> Login.</b></p>
+                <RegisterForm setEnterPage={setPage}/>
+                <div className={styles.Links}>
+                    <p>Already have an account? <b onClick={()=>{setPage("login")}}> Login.</b></p>
+                </div>
             </div>
-            : 
+            : page === "confirm_email" ? 
+            <div className={styles.Content}>
+                <h1 className={styles.CenteredRow}>Confirm your Email</h1>
+                <div className={styles.Form}>Successful signup! An email was sent to you, please confirm.</div>
+                <div className={styles.Links}>
+                    <p>Back to log in! <b onClick={()=>{setPage("login")}}> Login.</b></p>
+                </div>
+            </div> 
+            :
             <div className={styles.Content}>
                 <h1 className={styles.CenteredRow}>Reset Password</h1>
                 <ResetPasswordPage/>
-                <p>Already have an account? <b onClick={()=>{setPage("login")}}> Login.</b></p>
+                <div className={styles.Links}>
+                    <p>Already have an account? <b onClick={()=>{setPage("login")}}> Login.</b></p>
+                </div>
             </div>}
         </div>
     );

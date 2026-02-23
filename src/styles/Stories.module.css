@@ -1,0 +1,30 @@
+.FriendRow {
+    background-color: white;
+}
+
+.FriendRowActive {
+    background-color: lightblue;
+}
+
+.FriendContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10%;
+}
+
+.FriendContainer div {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border-radius: 12px;
+    padding: 15px 10px;
+    border: 1px solid #eee;
+    border-top: 3px solid #eee;
+    border-bottom: 3px solid #eee;
+}
+
+
+.AcceptButton {
+    width: 100%
+}

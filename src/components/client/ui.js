@@ -7,6 +7,7 @@ import { Switch } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import { useState, useEffect } from 'react';
 import { image_LRUCache } from '@/lib/client/image_cache';
+import { putImage } from '@/lib/server/actions';
 
 const pathMapping = {
     'home' : '/dashboard',
@@ -39,7 +40,7 @@ export function TabBar() {
                 {/* Tabs */}
                 <StyledTab pathKey={'home'} title={'Map'} curr_path={pathname}/>
                 <StyledTab pathKey={'friends'} title={'Friends'} curr_path={pathname}/>
-                <StyledTab pathKey={'stories'} title={'Stories'} curr_path={pathname}/>
+                {/* <StyledTab pathKey={'stories'} title={'Stories'} curr_path={pathname}/> */}
             </div>
 
             {/* Logo */}
@@ -83,15 +84,26 @@ export function Tooltip({tip, width, height}) {
     )
 }
 
+export function TooltipText( {tip, width, height, text} ) {
+    return (
+        <div className={styles.TipTextCombo}>
+            <div className={styles.Text}>{text}</div>
+            <Tooltip tip={tip} width={width} height={height}/>
+        </div>
+    )
+}
+
 export function SignedImage({ owner, type, width, height }) {
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
     let alive = true;
 
-    image_LRUCache.get(owner, type).then((u) => {
-      if (alive) setUrl(u);
-    });
+    // image_LRUCache.get(owner, type).then((u) => {
+    //   if (alive) setUrl(u);
+    // });
+
+    setUrl(false)
 
     return () => {
       alive = false;
@@ -109,6 +121,22 @@ export function SignedImage({ owner, type, width, height }) {
       unoptimized
     />
   );
+}
+
+export function ImageUpload({type}) {
+
+    const mapping = new Map([
+      ['profile-picture', 'profile-pictures-tt1437']
+    ])
+
+    return (
+        <form action={putImage}>
+            <input type="file" name="file" accept="image/*" required></input>
+            <input type='hidden' name='type' value={type}/>
+            <input type='hidden' name='bucket' value={mapping.get(type)}/>
+            <button type={'submit'}>submit</button>
+        </form>
+    )
 }
 
 // export function ProfilePhoto({ owner, type, width, height }) {

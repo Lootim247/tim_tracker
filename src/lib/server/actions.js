@@ -21,8 +21,12 @@ export async function newAPIkeyAction() {
     }
 }
 
-export async function putImage(type, bucket, image) {
+export async function putImage(formData) {
+  const type = formData.get('type')
+  const bucket = formData.get('bucket')
+  const file = formData.get('file')
   const supabase = await createServerSupabase()
+  const buffer = Buffer.from(await file.arrayBuffer());
 
   const { data, error } = await supabase.rpc("put_image", {
     type: type,
@@ -31,11 +35,22 @@ export async function putImage(type, bucket, image) {
 
   const command = new PutObjectCommand({
     Bucket: bucket,
-    Key: data,
-    Body: image
+    Key: data + '.jpg',
+    Body: buffer
   });
 
-  const response = await s3Client.send(command);
+  try {
+    const response = await s3Client.send(command);
+  } catch (e) {
+    console.log(data);
+    const { error } = await supabase
+      .from("bucket_data")
+      .delete()
+      .eq('id', data)
+    if (error) throw error;
+    
+    throw e;
+  }
 
   if (error || !data) {
     throw new Error("Failed to add")

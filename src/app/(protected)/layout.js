@@ -16,13 +16,13 @@ export default async function ProtectedLayout({ children }) {
   }
   
   const db = await createServerSupabase()
-  const related_users = await getRelatedUsers(db, user.id)
+  const related_users = await getRelatedUsers(db)
   const related_stories = await getRelatedStories(db)
 
   // value={{ user: null, friends: null, story_info: null }}
   // value={{ user: user.id, friends: related_users, story_info: related_stories }}
   return (
-    <LayoutProvider value={{ user: user.id, friends: related_users, story_info: related_stories }}>
+    <LayoutProvider value={{ user: user.id, friends: related_users, stories: related_stories }}>
       {children}
     </LayoutProvider>
   )

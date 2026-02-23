@@ -89,6 +89,9 @@ export async function POST(req) {
     return Response.json({ result: 'ok' }, { status: 200 })
   }
 
+  // Expects two things:
+  // - User must put their prehashed api password in the application
+  // - User must put their email in the user spot
   async function processOwntrackRequest(req) {
     const body = await req.json()
     if (body._type != "location") {
@@ -110,6 +113,9 @@ export async function POST(req) {
     const user_id = await AuthenticateKey(db, user, hashedKey)
 
     if (!user_id) {
+      console.error('Error: Authentication did not return a user_id')
+      console.error(`Given user: ${user}`)
+      console.error(`Given key: ${rawKey}`)
       return Response.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -119,7 +125,7 @@ export async function POST(req) {
     const row = {
       longitude: body.lon,
       latitude: body.lat,
-      created_at: dayjs.unix(body.created_at).toISOString(),
+      created_at: dayjs().utc().format(),
       user_id: user_id,
     };
 
@@ -155,7 +161,7 @@ export async function POST(req) {
       )
     }
   } else {
-    return Response.json({ error: 'Sender agent format not accepted' }, { status: 401 })
+    return Response.json({ error: 'Sender agent format not accepted' }, { status: 422 })
   }
 }
 

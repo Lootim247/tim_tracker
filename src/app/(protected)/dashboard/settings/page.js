@@ -1,9 +1,18 @@
 "use client";
 
-import { useActionState } from "react";
-import { newAPIkeyAction } from "@/lib/server/actions";
-import { logout } from "@/lib/client/auth";
+import Link from "next/link";
+import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EditProfile, Location, OtherSettings, AccountSettings } from "@/components/client/setting_pages";
+import styles from '@/styles/Settings.module.css'
+
+const ComponentMapping = new Map([
+  ['Profile' , <EditProfile key={1}/>],
+  ['Location', <Location key={2}/>],
+  ['Account', <AccountSettings key={4}/>],
+  ['Misc', <OtherSettings key={3}/>]
+])
+
 
 export default function SettingsPage() {
   /*
@@ -12,37 +21,19 @@ export default function SettingsPage() {
   * delete any tracking at any time.
   */
 
-
   const router = useRouter()
-  const [state, formAction] = useActionState(newAPIkeyAction, null);
+  const [value, setValue] = useState('Profile')
 
-  console.log(state)
+  const keys = Array.from(ComponentMapping.keys());
+
   return (
-    <div>
-      <form action={formAction}>
-        <button type="submit">Generate New Key</button>
-
-        {state?.apiKey && (
-          <p>
-            <strong>New API Key:</strong> {state.apiKey}
-          </p>
-        )}
-
-        {state?.error && <p style={{ color: "red" }}>{state.error}</p>}
-      </form>
-
-
-      <button
-        onClick={async () => {
-                    try {
-                    console.log("starting logout")
-                    await logout();
-                    router.push('/enter')
-                    router.refresh()
-                    } catch (err) {
-                    console.error("Logout failed:", err);
-                    }
-                }}>Log Out</button>
+    <div className={styles.Wrapper}>
+      <div className={styles.SideBar}>
+        {keys.map((key, i)=>(
+          <button onClick={()=>(setValue(key))} key={i}>{key}</button>
+        ))}
+      </div>
+      <div className={styles.Content}>{ComponentMapping.get(value)}</div>
     </div>
-  );
+  );  
 }

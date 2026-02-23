@@ -28,7 +28,7 @@ export function UserSelector({maxItems}) {
             <div 
             className={styles.UserCard}
             onClick={()=>homeContext.user.set(user_obj)}>
-                <SignedImage owner={user_obj.friend_id} type={'profile-picture'} width={30} height={30}/>
+                <SignedImage owner={user_obj.friend_id} type={'profile-picture'} width={'50%'} height={'50%'}/>
                 {user_obj.title}
             </div>
         )
@@ -37,7 +37,7 @@ export function UserSelector({maxItems}) {
     const start = homeContext.barPos.get * maxItems
     const end = (user_list.length < start + maxItems? user_list.length : start + maxItems) + 1
     return (
-        <div>
+        <div className={styles.CardList}>
             {homeContext.barPos.get != 0 && <p>{'<'}</p>}
             {user_list.slice(start, end).map(item => (
                 <UserCard
@@ -58,25 +58,19 @@ export function SideBar() {
 
     // TODO: get all recent stories for this specific user. (cache?)
     // TODO: Get profile pictures and other items for the user
-    const [selectedStory, setSelectedStory] = useState(null)
-    const stories = [
-        {id:1, title:'story'}, {id:2, title:'story2'}, {id:3, title:'story3'}
-    ]
-    console.log(user_obj)
-    
+    // const [selectedStory, setSelectedStory] = useState(null)
+    // const stories = [
+    //     {id:1, title:'story'}, {id:2, title:'story2'}, {id:3, title:'story3'}
+    // ]    
     if (!user_obj) return (<></>)
 
     
-    console.log(user_obj)
     return (
         <div className={styles.SideBarContent}>
             <div>{user_obj.title}</div>
             <SignedImage owner={user_obj.friend_id} type={'profile-picture'} width={100} height={100}/>
-            <div>Available Stories</div>
-            {stories.map(story => (
-                <div key={story.id}>{story.title}</div>
-            ))}
-            {selectedStory && <div>Story!</div>}
+            <div>Description</div>
+            <div>DATE SELECTOR?</div>
         </div>
     )
 }

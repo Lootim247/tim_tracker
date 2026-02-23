@@ -11,7 +11,7 @@
 .Content {
     min-width: 40%;
     display: block;
-    padding: auto 20px;
+    padding: 10px 20px;
     border: 2px solid #eee;
     border-radius: 10px;
 }
@@ -22,7 +22,16 @@
     justify-content: center;
 }
 
+.Links {
+    padding-top: 10px;
+}
+
+.Links p  b{
+    color: blue;
+}
+
 .Form {
+    padding-top: 30px;
     gap: 5px;
     display: flex;
     flex-direction: column;
@@ -30,6 +39,16 @@
 
 .Form input {
     padding: 4px;
+}
+
+.Error {
+    border-radius: 8px;
+    background-color: var(--reject-background);
+    padding: 5px 10px;
+    border: 1px solid var(--reject-border);
+    border-top: 3px solid var(--reject-border);
+    border-bottom: 3px solid var(--reject-border);
+    width: 100%;
 }
 
 .SubmitButton {
@@ -40,8 +59,4 @@
 
 .SubmitButton:hover {
     background-color: green;
-}
-
-.TipLabel {
-    display: flex;
 }

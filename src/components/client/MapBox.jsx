@@ -57,7 +57,6 @@ const MapView = forwardRef(function MapView(props, ref) {
       mb.addLayer({
         'id': 'circle-layer',
         'type': 'circle',
-        'filter': ["all", ["has", "point_count"], ['>', 'point_count', 4]],
         'source': 'points-source',
         'paint': {
           'circle-radius': 15,

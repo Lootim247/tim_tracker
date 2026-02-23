@@ -81,6 +81,7 @@ export default function FriendPage() {
     */
     const router = useRouter();
     const context = useContext(LayoutContext)
+    console.log(context)
     
 
     // test context:

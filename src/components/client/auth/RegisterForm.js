@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { signup } from "@/lib/client/auth";
-import { Tooltip } from "../ui";
+import { TooltipText } from "../ui";
+import { useRouter } from "next/navigation";
 import styles from '@/styles/Enter.module.css'
 import { LabelOff } from "@mui/icons-material";
 
-export default function RegisterForm() {
+export default function RegisterForm({setEnterPage}) {
     const [pword, setPword] = useState("")
     const [confirmPW, setConfirmPW] = useState("")
     const [email, setEmail] = useState("")
@@ -14,63 +15,59 @@ export default function RegisterForm() {
     const [error, setError] = useState(null);
     const [isPending, startTransition] = useTransition();
 
+    const router = useRouter();
+
     // validate the users input
     function validate() {
         if (!email.includes("@")) {
-        return "Invalid email address";
+        return "Invalid email address.";
         }
         if (pword.length < 8) {
-        return "Password must be at least 8 characters";
+        return "Password must be at least 8 characters.";
         }
         if (confirmPW !== pword) {
-        return "Passwords do not match";
+        return "Passwords do not match.";
         }
         return null;
     }
 
     function handleSubmit(e) {
+        setError(null);
         e.preventDefault();
-        console.log("submitting")
         const validationError = validate();
         if (validationError) {
-        setError(validationError);
-        return;
+            setError(validationError);
+            return;
         }
 
-        console.log("no errors")
-        setError(null);
-
         startTransition(async () => {
-            console.log("trying signup")
             const res = await signup(title, email, pword);
-            console.log("done signup")
             if (res?.error) {
                 console.log(res.error)
                 setError(res.error);
+            } else {
+                setEnterPage('confirm_email')
             }
         });
     }
 
     return (
         <form className={styles.Form} onSubmit={handleSubmit}>
+            {error && <div className={styles.Error}>{error}</div>}
             <label>Email:</label>
-            {error && <div>{error}</div>}
             <input 
-                type="email" 
                 name="email"
                 onChange={(e)=>{setEmail(e.target.value)}}
                 placeholder="Enter your email." 
                 required
             />
 
-            <div className={styles.TipLabel}>
-                <label>Title:</label>
-                <Tooltip 
-                    tip={'Other users will see this title.'}
-                    width={10}
-                    height={10}
-                />
-            </div>
+            <TooltipText
+                text={'Title:'}
+                tip={'Other users will see this title.'}
+                width={10}
+                height={10}
+            />
             <input 
                 className={styles.Input}
                 type="name" 

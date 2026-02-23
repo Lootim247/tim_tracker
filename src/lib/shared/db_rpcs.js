@@ -20,7 +20,7 @@ export async function getTrackingsByTimeUID1(DB_client, timestamp1, timestamp2) 
 }
 
 
-export async function getRelatedUsers(DB_client, user_id) {
+export async function getRelatedUsers(DB_client) {
     const { data, error } = await DB_client.rpc("get_related_users", {});
     if (error) throw error;
     return data;
@@ -77,6 +77,8 @@ export async function UpdateSharing(DB_client, friend_id, newValue) {
     return data;
 }
 
+
+// A batched update sharing (returns sharing updates)
 export async function UpdateSharingBatch(DB_client, payload) {
     let fail_arr = [];
     for (const { friend_id, status } of payload) {
@@ -112,4 +114,26 @@ export async function UpdateStoryGroup(DB_client, story_id, update_id, action) {
         .select()
     }
     
+}
+
+export async function CreateStory(DB_client, title, users) {
+    const { data, error } = await DB_client.rpc('create_story', {
+        title : title
+    })
+
+    if (error) throw error;
+
+    const json_users = [];
+    const story_id = data;
+    users.forEach(id => {
+        json_users.push({'user_id' : id, 'story_id': story_id})
+    });
+
+    console.log(json_users)
+
+    const { res } = await DB_client
+        .from('user_story')
+        .insert(json_users)
+    
+    console.log(res)
 }

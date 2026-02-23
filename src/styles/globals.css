@@ -4,8 +4,8 @@
   --accept-background: green;
   --accept-border: #8bb1d5;
   --accept-hover: green;
-  --reject-background: #ff7272;
-  --reject-border: red;
+  --reject-background: #FAA0A0;
+  --reject-border: #FA8072;
   --reject-hover: red;
 }
 

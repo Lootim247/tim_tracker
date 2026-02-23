@@ -36,6 +36,19 @@
 
 .Tooltip {
     position: relative;
+    top: -4px;
+}
+
+.TipTextCombo {
+    padding-right: 2%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.Text {
+    display: block;
+    padding-right: 1%;
 }
 
 .Tooltip:hover .TooltipText {
