@@ -23,6 +23,10 @@ export async function POST(req) {
   const DIST_THRESH = 0.01
   const db = await createNonAuthServer()
 
+
+  // ==========================================================================
+  // processOverlandRequest
+  // ==========================================================================
   async function processOverlandRequest(req) {
     const authHeader = req.headers.get('authorization')
     const rawKey = authHeader?.split(' ')[1]
@@ -89,21 +93,32 @@ export async function POST(req) {
     return Response.json({ result: 'ok' }, { status: 200 })
   }
 
+
+  // ==========================================================================
+  // processOwntrackRequest
+  // ==========================================================================
   // Expects two things:
   // - User must put their prehashed api password in the application
-  // - User must put their email in the user spot
+  // - User must put their email in the user
   async function processOwntrackRequest(req) {
     const body = await req.json()
     if (body._type != "location") {
       return Response.json({ result: 'ok' }, { status: 200 })
     }
-    console.log('here')
 
-    const rawKey = req.headers.get('php-auth-pw')
-    const user = req.headers.get('php-auth-user')
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      console.log('Missing or invalid auth header')
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    const base64Credentials = authHeader.split(' ')[1]
+    const credentials = atob(base64Credentials)
+    const [user, rawKey] = credentials.split(':')
 
-    console.log(rawKey)
-    console.log(user)
+    console.log('Parsed credentials - user:', user)
+    console.log('Parsed credentials - key present:', !!rawKey)
+
     if (!rawKey || !user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
     const hashedKey = hashApiKey(rawKey)
 
@@ -137,6 +152,7 @@ export async function POST(req) {
 
     return Response.json({ result: 'ok' }, { status: 200 });
   }
+  // ==========================================================================
 
   // get sender type. Support only owntracks and overland
   const agent = req.headers.get('user-agent');
